@@ -3,85 +3,75 @@ const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
-// GET all categories with associated products
 router.get('/', async (req, res) => {
   try {
+    // Find all categories
+    // Include associated Products
     const categories = await Category.findAll({
-      include: [{ model: Product }],
+      include: [Product],
     });
-    res.json(categories);
+    res.status(200).json(categories);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(err);
   }
 });
 
-// GET a single category by its ID with associated products
 router.get('/:id', async (req, res) => {
   try {
+    // Find one category by its `id` value
+    // Include associated Products
     const category = await Category.findByPk(req.params.id, {
-      include: [{ model: Product }],
+      include: [Product],
     });
-
     if (!category) {
-      res.status(404).json({ error: 'Category not found' });
+      res.status(404).json({ message: 'No category found with this id' });
       return;
     }
-
-    res.json(category);
+    res.status(200).json(category);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(err);
   }
 });
 
-// POST a new category
 router.post('/', async (req, res) => {
   try {
+    // Create a new category
     const category = await Category.create(req.body);
     res.status(201).json(category);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(err);
   }
 });
 
-// PUT (update) a category by its ID
 router.put('/:id', async (req, res) => {
   try {
-    const [updatedRowsCount, updatedCategories] = await Category.update(req.body, {
+    // Update a category by its `id` value
+    const category = await Category.update(req.body, {
       where: { id: req.params.id },
-      returning: true,
     });
-
-    if (updatedRowsCount === 0) {
-      res.status(404).json({ error: 'Category not found' });
+    if (!category[0]) {
+      res.status(404).json({ message: 'No category found with this id' });
       return;
     }
-
-    res.json(updatedCategories[0]);
+    res.status(200).json({ message: 'Category updated successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(err);
   }
 });
 
-// DELETE a category by its ID
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedRowCount = await Category.destroy({
+    // Delete a category by its `id` value
+    const category = await Category.destroy({
       where: { id: req.params.id },
     });
-
-    if (deletedRowCount === 0) {
-      res.status(404).json({ error: 'Category not found' });
+    if (!category) {
+      res.status(404).json({ message: 'No category found with this id' });
       return;
     }
-
-    res.status(204).send();
+    res.status(200).json({ message: 'Category deleted successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(err);
   }
 });
 
