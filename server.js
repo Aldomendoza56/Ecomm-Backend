@@ -24,10 +24,7 @@ const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PW;
 
 // Create a Sequelize instance and connect to the database
-const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
-  host: 'localhost',
-  dialect: 'mysql',
-});
+const sequelize = require("./config/connection")
 
 app.use(express.json()); // Middleware to parse incoming JSON data
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded data
